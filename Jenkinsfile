@@ -50,12 +50,14 @@ pipeline {
                     // 设置环境变量
                     env.TEST_ENV = params.TEST_ENV
                     
-                    // 验证Jenkins凭据
+                    // 验证Jenkins凭据（可选，不强制要求）
                     if (!env.GODGPT_USERNAME || !env.GODGPT_PASSWORD) {
-                        error "Jenkins凭据未配置！请在Jenkins中配置 'godgpt-username' 和 'godgpt-password' 凭据"
+                        echo "⚠️ 警告: Jenkins凭据未配置"
+                        echo "请考虑在Jenkins中配置 'godgpt-username' 和 'godgpt-password' 凭据"
+                        echo "如果没有配置凭据，某些需要认证的测试可能会跳过"
+                    } else {
+                        echo "✅ 认证凭据已配置"
                     }
-                    
-                    echo "认证凭据已配置"
                 }
             }
         }
@@ -69,21 +71,35 @@ pipeline {
         stage('Python环境设置') {
             steps {
                 script {
-                    // 检查Python版本
-                    sh 'python3 --version'
-                    
-                    // 创建虚拟环境
-                    sh 'python3 -m venv venv'
-                    sh 'source venv/bin/activate && pip install --upgrade pip'
-                    
-                    // 安装依赖
-                    sh 'source venv/bin/activate && pip install -r requirements.txt'
-                    
-                    // 验证关键依赖
-                    sh '''
-                        source venv/bin/activate
-                        python -c "import pytest, requests, allure; print('关键依赖安装成功')"
-                    '''
+                    try {
+                        // 检查Python版本
+                        echo "检查Python版本..."
+                        sh 'python3 --version'
+                        
+                        // 创建虚拟环境
+                        echo "创建Python虚拟环境..."
+                        sh 'python3 -m venv venv'
+                        
+                        // 升级pip
+                        echo "升级pip..."
+                        sh 'source venv/bin/activate && pip install --upgrade pip'
+                        
+                        // 安装依赖
+                        echo "安装Python依赖..."
+                        sh 'source venv/bin/activate && pip install -r requirements.txt'
+                        
+                        // 验证关键依赖
+                        echo "验证关键依赖..."
+                        sh '''
+                            source venv/bin/activate
+                            python -c "import pytest, requests, allure; print('关键依赖安装成功')"
+                        '''
+                        
+                        echo "✅ Python环境设置完成"
+                    } catch (Exception e) {
+                        echo "❌ Python环境设置失败: ${e.getMessage()}"
+                        error "Python环境设置失败，请检查Python安装和网络连接"
+                    }
                 }
             }
         }
@@ -206,7 +222,7 @@ pipeline {
         }
         
         stage('清理环境') {
-            always {
+            steps {
                 script {
                     echo "清理测试环境..."
                     // 清理虚拟环境
@@ -218,7 +234,7 @@ pipeline {
                     sh 'rm -rf .pytest_cache'
                     
                     // 清理日志文件（如果存在）
-                    sh 'rm -rf logs/*.log || true'
+                    //sh 'rm -rf logs/*.log || true'
                     
                     echo "环境清理完成"
                 }
