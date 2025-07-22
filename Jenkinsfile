@@ -5,6 +5,7 @@ pipeline {
         PYTHON_VERSION = '3.9'
         TEST_ENV = 'dev'
         ALLURE_VERSION = '2.24.0'
+        LARK_WEBHOOK_URL = 'https://open.larksuite.com/open-apis/bot/v2/hook/a5fb88d3-c294-4fd3-be90-af3254f05b44'
     }
     
     parameters {
@@ -167,6 +168,9 @@ pipeline {
                     
                     // 验证Allure安装
                     sh 'allure --version'
+                    
+                    // 设置Allure工具路径供Jenkins插件使用
+                    env.ALLURE_COMMAND = "${WORKSPACE}/allure-${ALLURE_VERSION}/bin/allure"
                 }
             }
         }
@@ -234,23 +238,7 @@ pipeline {
             }
         }
         
-        stage('发布报告') {
-            when {
-                expression { params.GENERATE_REPORT == true }
-            }
-            steps {
-                script {
-                    // 发布Allure报告到Jenkins
-                    allure([
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'allure-results']]
-                    ])
-                }
-            }
-        }
+
         
         stage('清理环境') {
             steps {
@@ -287,6 +275,97 @@ pipeline {
                     echo "⏹️ 测试执行被中断！"
                 }
                 
+                // 发送飞书通知
+                def status = currentBuild.result ?: 'SUCCESS'
+                def statusText = ''
+                def statusColor = ''
+                
+                switch(status) {
+                    case 'SUCCESS':
+                        statusText = '✅ 成功'
+                        statusColor = '#00FF00'
+                        break
+                    case 'FAILURE':
+                        statusText = '❌ 失败'
+                        statusColor = '#FF0000'
+                        break
+                    case 'UNSTABLE':
+                        statusText = '⚠️ 不稳定'
+                        statusColor = '#FFA500'
+                        break
+                    default:
+                        statusText = '⏹️ 中断'
+                        statusColor = '#808080'
+                }
+                
+                def message = [
+                    msg_type: "interactive",
+                    card: [
+                        config: [
+                            wide_screen_mode: true
+                        ],
+                        header: [
+                            title: [
+                                tag: "plain_text",
+                                content: "GodGPT API巡检测试结果"
+                            ],
+                            template: statusColor
+                        ],
+                        elements: [
+                            [
+                                tag: "div",
+                                text: [
+                                    tag: "lark_md",
+                                    content: "**项目名称**: GodGPT API自动化巡检项目\n**构建编号**: #${currentBuild.number}\n**构建状态**: ${statusText}\n**构建时间**: ${new Date().format('yyyy-MM-dd HH:mm:ss')}\n**构建时长**: ${currentBuild.durationString}"
+                                ]
+                            ],
+                            [
+                                tag: "div",
+                                text: [
+                                    tag: "lark_md",
+                                    content: "**测试环境**: ${params.TEST_ENV}\n**测试标记**: ${params.TEST_MARKERS}\n"
+                                ]
+                            ],
+                            [
+                                tag: "action",
+                                actions: [
+                                    [
+                                        tag: "button",
+                                        text: [
+                                            tag: "plain_text",
+                                            content: "查看测试报告"
+                                        ],
+                                        type: "primary",
+                                        url: "${env.BUILD_URL}artifact/allure-report/index.html"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+                
+                // 发送飞书通知
+                try {
+                    // 将消息转换为JSON字符串
+                    def jsonMessage = groovy.json.JsonOutput.toJson(message)
+                    
+                    // 使用curl发送HTTP请求
+                    def response = sh(
+                        script: """
+                            curl -X POST \\
+                                -H 'Content-Type: application/json' \\
+                                -d '${jsonMessage}' \\
+                                '${env.LARK_WEBHOOK_URL}'
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    
+                    echo "飞书通知响应: ${response}"
+                    echo "✅ 飞书通知发送成功"
+                } catch (Exception e) {
+                    echo "❌ 飞书通知发送异常: ${e.getMessage()}"
+                }
+                
                 // 清理完成
             }
         }
@@ -294,21 +373,18 @@ pipeline {
         success {
             script {
                 echo "🎉 所有测试通过！"
-                // 可以在这里添加成功通知（邮件、钉钉等）
             }
         }
         
         failure {
             script {
                 echo "💥 测试失败，请检查日志！"
-                // 可以在这里添加失败通知
             }
         }
         
         unstable {
             script {
                 echo "⚠️ 测试不稳定，请检查！"
-                // 可以在这里添加不稳定通知
             }
         }
     }
