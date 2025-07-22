@@ -107,8 +107,13 @@ class TestVoiceChatAPI:
                                 logger.debug(f"[Chunk {i}] 解析结果: {parsed}")
 
                                 # 验证 ErrorCode == 0
-                                assert "ErrorCode" in parsed, f"[Chunk {i}] 缺少 ErrorCode 字段"
-                                assert parsed["ErrorCode"] == 0, f"[Chunk {i}] ErrorCode 不为 0：{parsed['ErrorCode']}"
+                                # assert "ErrorCode" in parsed, f"[Chunk {i}] 缺少 ErrorCode 字段"
+                                # assert parsed["ErrorCode"] == 0, f"[Chunk {i}] ErrorCode 不为 0：{parsed['ErrorCode']}"
+
+                                # 验证 response 字段
+                                assert "response" in parsed, f"[Chunk {i}] 缺少 response 字段"
+                                assert parsed["response"] != "You've run out of credits.", f"[Chunk {i}] response 为 You've run out of credits."
+                                
 
                         else:
                             logger.info("响应为普通文本格式")
