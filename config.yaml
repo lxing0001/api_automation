@@ -1,0 +1,39 @@
+# API测试框架配置文件
+
+# 基础配置
+base_url: "https://station-developer.aevatar.ai"
+timeout: 30
+retry_times: 3
+
+# 日志配置
+log_level: "INFO"
+
+# Allure报告配置
+allure_results_dir: "./allure-results"
+allure_report_dir: "./allure-report"
+
+# 测试环境配置
+environments:
+  dev:
+    base_url: "https://station-developer.aevatar.ai"
+    timeout: 30
+    
+  test:
+    base_url: "https://station-developer.aevatar.ai"
+    timeout: 30
+    
+  prod:
+    base_url: "https://station-developer.aevatar.ai"
+    timeout: 60
+
+# 测试数据配置
+test_data:
+  user_count: 10
+  post_count: 20
+  comment_count: 50
+
+# 报告配置
+report:
+  title: "API自动化测试报告"
+  description: "使用pytest + requests + allure的API自动化测试框架"
+  environment: "开发环境" 
