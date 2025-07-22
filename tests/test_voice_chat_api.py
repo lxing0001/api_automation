@@ -88,15 +88,34 @@ class TestVoiceChatAPI:
                         response_text = response.text
                         assert len(response_text) > 0, "响应内容不应为空"
                         logger.info(f"语音聊天响应内容长度: {len(response_text)}")
-                        
+
                         # 检查是否为事件流格式
                         if 'data:' in response_text or 'event:' in response_text:
                             logger.info("响应为事件流格式")
+
+                            # 提取每一行以 "data: " 开头的部分
+                            lines = response_text.strip().splitlines()
+                            data_lines = [line for line in lines if line.startswith("data:")]
+
+                            assert len(data_lines) > 0, "事件流中未找到 data 字段"
+
+                            for i, line in enumerate(data_lines):
+                                json_part = line[len("data:"):].strip()
+                                parsed = json.loads(json_part)
+
+                                logger.debug(f"[Chunk {i}] 解析结果: {parsed}")
+
+                                # 验证 ErrorCode == 0
+                                assert "ErrorCode" in parsed, f"[Chunk {i}] 缺少 ErrorCode 字段"
+                                assert parsed["ErrorCode"] == 0, f"[Chunk {i}] ErrorCode 不为 0：{parsed['ErrorCode']}"
+
                         else:
                             logger.info("响应为普通文本格式")
-                        
+                            # 如果是普通文本，可以按需添加其他验证逻辑
+
                     except Exception as e:
                         logger.warning(f"响应格式验证失败: {e}")
+                        pytest.fail(f"响应格式验证失败: {e}")
                         
             except Exception as e:
                 if "401" in str(e) or "403" in str(e):
@@ -266,4 +285,4 @@ class TestVoiceChatAPI:
                 else:
                     raise e
     
-   
+ 
