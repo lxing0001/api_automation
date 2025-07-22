@@ -1,5 +1,6 @@
 import pytest
 import allure
+import json
 from common.http_client import HttpClient
 from common.assertions import ApiAssertions
 from common.logger import logger
