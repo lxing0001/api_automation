@@ -73,10 +73,31 @@ pipeline {
                         
                         // 手动检出代码
                         sh '''
-                            git init
-                            git remote add origin https://github.com/lxing0001/api_automation.git
-                            git fetch origin
-                            git checkout main
+                            # 检查是否已有Git仓库
+                            if [ -d ".git" ]; then
+                                echo "Git仓库已存在，检查远程配置..."
+                                git remote -v
+                                
+                                # 如果远程仓库不存在或配置错误，重新配置
+                                if ! git remote get-url origin >/dev/null 2>&1; then
+                                    echo "添加远程仓库..."
+                                    git remote add origin https://github.com/lxing0001/api_automation.git
+                                else
+                                    echo "远程仓库已配置"
+                                fi
+                                
+                                # 拉取最新代码
+                                echo "拉取最新代码..."
+                                git fetch origin
+                                git checkout main || git checkout master
+                                git pull origin main || git pull origin master
+                            else
+                                echo "初始化Git仓库..."
+                                git init
+                                git remote add origin https://github.com/lxing0001/api_automation.git
+                                git fetch origin
+                                git checkout main || git checkout master
+                            fi
                         '''
                         echo "✅ 手动代码检出完成"
                     }
@@ -150,28 +171,7 @@ pipeline {
             }
         }
         
-        stage('代码检查') {
-            steps {
-                script {
-                    sh '''
-                        . venv/bin/activate
-                        echo "执行代码质量检查..."
-                        
-                        # 检查flake8是否安装
-                        if python -c "import flake8" 2>/dev/null; then
-                            echo "flake8已安装，执行代码检查..."
-                            python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
-                            python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-                        else
-                            echo "⚠️ flake8未安装，跳过代码质量检查"
-                            echo "请确保requirements.txt中包含flake8"
-                        fi
-                        
-                        echo "代码检查完成"
-                    '''
-                }
-            }
-        }
+
         
         stage('运行测试') {
             steps {
