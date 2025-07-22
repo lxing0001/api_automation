@@ -125,8 +125,10 @@ class TestVoiceChatAPI:
         auth_headers['authorization'] = f'Bearer {self.auth_token}'
         
         # 请求数据（带地区）
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "今天天气怎么样？",
+            "content": f"今天天气怎么样？当前时间：{current_time}",
             "region": "北京",
             "sessionId": "71d34ea5-a9d5-45eb-bfc8-fe79132c7a4d",
             "messageType": 1,
@@ -179,8 +181,10 @@ class TestVoiceChatAPI:
         auth_headers['authorization'] = f'Bearer {self.auth_token}'
         
         # 请求数据（无效sessionId）
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "",
+            "content": f"无效sessionId测试，当前时间：{current_time}",
             "region": "",
             "sessionId": "invalid-session-id",
             "messageType": 1,

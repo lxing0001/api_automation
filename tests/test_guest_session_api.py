@@ -249,7 +249,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_basic(self):
         """测试非登录状态下的基本聊天"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "你好", "images": [], "region": ""}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"你好，当前时间：{current_time}", "images": [], "region": ""}
         
         # 为聊天API设置特殊的请求头
         chat_headers = self.default_headers.copy()
@@ -294,7 +296,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_with_images(self):
         """测试非登录状态下的聊天-带图片"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "分析这张图片", "images": ["image_url_1", "image_url_2"], "region": ""}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"分析这张图片，当前时间：{current_time}", "images": ["image_url_1", "image_url_2"], "region": ""}
         
         chat_headers = self.default_headers.copy()
         chat_headers['accept'] = 'text/event-stream'
@@ -326,7 +330,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_with_region(self):
         """测试非登录状态下的聊天-指定区域"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "你好", "images": [], "region": "CN"}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"你好，当前时间：{current_time}", "images": [], "region": "CN"}
         
         chat_headers = self.default_headers.copy()
         chat_headers['accept'] = 'text/event-stream'
@@ -358,7 +364,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_empty_content(self):
         """测试非登录状态下的聊天-空内容"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "", "images": [], "region": ""}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"空内容测试，当前时间：{current_time}", "images": [], "region": ""}
         
         chat_headers = self.default_headers.copy()
         chat_headers['accept'] = 'text/event-stream'
@@ -422,7 +430,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_performance(self):
         """测试非登录状态下的聊天-性能测试"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "你好", "images": [], "region": ""}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"性能测试，当前时间：{current_time}", "images": [], "region": ""}
         
         chat_headers = self.default_headers.copy()
         chat_headers['accept'] = 'text/event-stream'
@@ -455,7 +465,9 @@ class TestGuestSessionAPI:
     def test_guest_chat_concurrent(self):
         """测试非登录状态下的聊天-并发测试"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
-        request_data = {"content": "你好", "images": [], "region": ""}
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_data = {"content": f"并发测试，当前时间：{current_time}", "images": [], "region": ""}
         
         chat_headers = self.default_headers.copy()
         chat_headers['accept'] = 'text/event-stream'

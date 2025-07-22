@@ -95,6 +95,7 @@ class TestInvitationAPI:
                             logger.info(f"兑换邀请码成功，{found_success_field}: {field_value}")
                         else:
                             logger.info("响应中未找到成功相关字段，但API调用成功")
+                            pytest.fail("响应中未找到成功相关字段，但API调用成功")
                         
                     except Exception as e:
                         logger.warning(f"响应格式验证失败: {e}")

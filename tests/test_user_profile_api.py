@@ -91,6 +91,7 @@ class TestUserProfileAPI:
                         
                     except Exception as e:
                         logger.warning(f"响应格式验证失败: {e}")
+                        pytest.fail("响应格式验证失败")
                         
             except Exception as e:
                 if "401" in str(e) or "403" in str(e):

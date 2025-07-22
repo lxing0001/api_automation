@@ -86,7 +86,7 @@ class TestShareSessionAPI:
                         logger.info(f"分享会话响应内容: {response_json}")
                         
                         # 检查是否包含分享链接或相关字段
-                        share_fields = ['shareUrl', 'share_url', 'url', 'link', 'shareLink', 'share_link']
+                        share_fields = ['shareId']
                         found_share_field = None
                         for field in share_fields:
                             if field in response_json:
@@ -100,6 +100,7 @@ class TestShareSessionAPI:
                             logger.info(f"成功分享会话，{found_share_field}: {share_url}")
                         else:
                             logger.info("响应中未找到分享链接字段，但API调用成功")
+                            pytest.fail("响应中未找到分享链接字段，但API调用成功")
                         
                     except Exception as e:
                         logger.warning(f"响应格式验证失败: {e}")

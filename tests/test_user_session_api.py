@@ -141,8 +141,10 @@ class TestUserSessionAPI:
         auth_headers['accept'] = 'text/event-stream'
         
         # 请求数据
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "hello",
+            "content": f"hello，当前时间：{current_time}",
             "images": [],
             "region": "",
             "sessionId": self.session_id
@@ -205,8 +207,10 @@ class TestUserSessionAPI:
         auth_headers['accept'] = 'text/event-stream'
         
         # 请求数据（带图片）
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "请分析这张图片",
+            "content": f"请分析这张图片，当前时间：{current_time}",
             "images": ["https://example.com/image.jpg"],  # 示例图片URL
             "region": "",
             "sessionId": self.session_id
@@ -263,8 +267,10 @@ class TestUserSessionAPI:
         auth_headers['accept'] = 'text/event-stream'
         
         # 请求数据（带地区）
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "今天天气怎么样？",
+            "content": f"今天天气怎么样？当前时间：{current_time}",
             "images": [],
             "region": "北京",
             "sessionId": self.session_id
@@ -321,8 +327,10 @@ class TestUserSessionAPI:
         auth_headers['accept'] = 'text/event-stream'
         
         # 请求数据（空内容）
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "",
+            "content": f"空内容测试，当前时间：{current_time}",
             "images": [],
             "region": "",
             "sessionId": self.session_id
@@ -435,8 +443,10 @@ class TestUserSessionAPI:
         auth_headers['accept'] = 'text/event-stream'
         
         # 请求数据
+        import datetime
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         request_data = {
-            "content": "性能测试消息",
+            "content": f"性能测试消息，当前时间：{current_time}",
             "images": [],
             "region": "",
             "sessionId": self.session_id
@@ -497,8 +507,10 @@ class TestUserSessionAPI:
                 import concurrent.futures
                 
                 def make_chat_request():
+                    import datetime
+                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     request_data = {
-                        "content": f"并发测试消息{concurrent.futures.ThreadPoolExecutor()._counter}",
+                        "content": f"并发测试消息，当前时间：{current_time}",
                         "images": [],
                         "region": "",
                         "sessionId": self.session_id
