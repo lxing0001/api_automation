@@ -5,9 +5,6 @@ pipeline {
         PYTHON_VERSION = '3.9'
         TEST_ENV = 'dev'
         ALLURE_VERSION = '2.24.0'
-        // 从Jenkins凭据中获取敏感信息
-        GODGPT_USERNAME = credentials('godgpt-username')
-        GODGPT_PASSWORD = credentials('godgpt-password')
     }
     
     parameters {
@@ -50,21 +47,44 @@ pipeline {
                     // 设置环境变量
                     env.TEST_ENV = params.TEST_ENV
                     
-                    // 验证Jenkins凭据（可选，不强制要求）
-                    if (!env.GODGPT_USERNAME || !env.GODGPT_PASSWORD) {
-                        echo "⚠️ 警告: Jenkins凭据未配置"
-                        echo "请考虑在Jenkins中配置 'godgpt-username' 和 'godgpt-password' 凭据"
-                        echo "如果没有配置凭据，某些需要认证的测试可能会跳过"
-                    } else {
-                        echo "✅ 认证凭据已配置"
-                    }
+                    echo "✅ 环境准备完成"
                 }
             }
         }
         
         stage('代码检出') {
             steps {
-                checkout scm
+                script {
+                    echo "代码检出阶段..."
+                    echo "当前工作目录: ${WORKSPACE}"
+                    
+                    // 检查当前目录内容
+                    sh 'ls -la'
+                    
+                    // 对于自由风格项目，代码已经检出
+                    // 对于Pipeline项目，使用checkout scm
+                    try {
+                        echo "尝试检出代码..."
+                        checkout scm
+                        echo "✅ 代码检出完成"
+                    } catch (Exception e) {
+                        echo "⚠️ 代码检出失败: ${e.getMessage()}"
+                        echo "尝试手动检出代码..."
+                        
+                        // 手动检出代码
+                        sh '''
+                            git init
+                            git remote add origin https://github.com/lxing0001/api_automation.git
+                            git fetch origin
+                            git checkout main
+                        '''
+                        echo "✅ 手动代码检出完成"
+                    }
+                    
+                    // 验证文件是否存在
+                    sh 'ls -la'
+                    sh 'cat requirements.txt || echo "requirements.txt 不存在"'
+                }
             }
         }
         
@@ -82,16 +102,18 @@ pipeline {
                         
                         // 升级pip
                         echo "升级pip..."
-                        sh 'source venv/bin/activate && pip install --upgrade pip'
+                        sh '. venv/bin/activate && pip install --upgrade pip'
                         
                         // 安装依赖
                         echo "安装Python依赖..."
-                        sh 'source venv/bin/activate && pip install -r requirements.txt'
+                        echo "当前工作目录: ${WORKSPACE}"
+                        sh 'ls -la'
+                        sh '. venv/bin/activate && pip install -r requirements.txt'
                         
                         // 验证关键依赖
                         echo "验证关键依赖..."
                         sh '''
-                            source venv/bin/activate
+                            . venv/bin/activate
                             python -c "import pytest, requests, allure; print('关键依赖安装成功')"
                         '''
                         
@@ -132,10 +154,19 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        source venv/bin/activate
+                        . venv/bin/activate
                         echo "执行代码质量检查..."
-                        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
-                        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+                        
+                        # 检查flake8是否安装
+                        if python -c "import flake8" 2>/dev/null; then
+                            echo "flake8已安装，执行代码检查..."
+                            python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+                            python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+                        else
+                            echo "⚠️ flake8未安装，跳过代码质量检查"
+                            echo "请确保requirements.txt中包含flake8"
+                        fi
+                        
                         echo "代码检查完成"
                     '''
                 }
@@ -146,7 +177,7 @@ pipeline {
             steps {
                 script {
                     // 构建测试命令
-                    def test_cmd = "source venv/bin/activate && python -m pytest"
+                    def test_cmd = ". venv/bin/activate && python -m pytest"
                     
                     // 根据测试标记过滤
                     if (params.TEST_MARKERS != 'all') {
@@ -191,7 +222,7 @@ pipeline {
                 script {
                     // 生成Allure报告
                     sh '''
-                        source venv/bin/activate
+                        . venv/bin/activate
                         echo "生成Allure报告..."
                         allure generate allure-results -o allure-report --clean
                         echo "报告生成完成"
@@ -256,9 +287,7 @@ pipeline {
                     echo "⏹️ 测试执行被中断！"
                 }
                 
-                // 清理敏感信息
-                env.GODGPT_USERNAME = null
-                env.GODGPT_PASSWORD = null
+                // 清理完成
             }
         }
         

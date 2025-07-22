@@ -9,4 +9,5 @@ jsonschema==4.20.0
 python-dotenv==1.0.0
 PyYAML==6.0.1
 faker==20.1.0
-loguru==0.7.2 
+loguru==0.7.2
+flake8==6.1.0 
