@@ -88,13 +88,14 @@ class TestShareSessionAPI:
                         # 检查是否包含分享链接或相关字段
                         share_fields = ['shareId']
                         found_share_field = None
+                        response_data = response_json.get('data', {}) 
                         for field in share_fields:
-                            if field in response_json:
+                            if field in response_data:
                                 found_share_field = field
                                 break
                         
                         if found_share_field:
-                            share_url = response_json[found_share_field]
+                            share_url = response_data[found_share_field]
                             assert isinstance(share_url, str), f"{found_share_field}应该是字符串"
                             assert len(share_url) > 0, f"{found_share_field}不应为空"
                             logger.info(f"成功分享会话，{found_share_field}: {share_url}")
