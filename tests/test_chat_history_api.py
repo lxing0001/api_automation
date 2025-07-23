@@ -40,6 +40,7 @@ class TestChatHistoryAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.login
     def test_get_chat_history_basic(self):
         """测试查询聊天历史-基本功能"""
         if not self.auth_token:

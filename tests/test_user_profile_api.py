@@ -44,6 +44,7 @@ class TestUserProfileAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.login
     def test_get_user_profile(self):
         """测试查询用户Profile信息"""
         if not self.auth_token:

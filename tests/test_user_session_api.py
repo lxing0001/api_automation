@@ -124,6 +124,7 @@ class TestUserSessionAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.login
     def test_user_chat_basic(self):
         """测试用户聊天-基本对话"""
         if not self.auth_token:

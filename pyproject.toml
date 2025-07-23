@@ -40,6 +40,8 @@ markers = [
     "regression: 回归测试", 
     "api: API测试",
     "slow: 慢速测试",
+    "guest: 访客测试",
+    "login: 登录测试",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",

@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    // 定时触发器：每天1、3、5、7、9、11、13、15、17、19、21、23点整点执行
+    triggers {
+        cron('0 1,3,5,7,9,11,13,15,17,19,21,23 * * *')
+    }
+    
     environment {
         PYTHON_VERSION = '3.9'
         TEST_ENV = 'dev'

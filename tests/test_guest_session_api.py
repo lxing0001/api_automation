@@ -37,6 +37,7 @@ class TestGuestSessionAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.guest
     def test_create_guest_session(self):
         """测试创建访客会话"""
         endpoint = "/godgptprod-client/api/godgpt/guest/create-session"

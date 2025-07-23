@@ -43,6 +43,7 @@ class TestInvitationAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.login
     def test_redeem_invitation_code_basic(self):
         """测试兑换邀请码-基本功能"""
         if not self.auth_token:
