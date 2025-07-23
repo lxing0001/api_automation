@@ -12,6 +12,8 @@
 - ✅ **断言丰富**: 提供多种API断言方法
 - ✅ **日志完善**: 使用loguru进行日志记录
 - ✅ **重试机制**: 内置HTTP请求重试策略
+- ✅ **认证管理**: 全局认证token管理
+- ✅ **并发测试**: 支持并行执行测试用例
 
 ## 📁 项目结构
 
@@ -23,21 +25,30 @@ auto_test/
 │   ├── logger.py             # 日志管理
 │   ├── http_client.py        # HTTP客户端
 │   ├── assertions.py         # 断言工具
+│   ├── auth_manager.py       # 认证管理
 │   └── test_data.py          # 测试数据管理
 ├── tests/                    # 测试用例
 │   ├── __init__.py
-│   ├── test_users_api.py     # 用户API测试
-│   ├── test_posts_api.py     # 文章API测试
-│   └── test_comments_api.py  # 评论API测试
+│   ├── test_auth_manager.py      # 认证管理测试
+│   ├── test_chat_history_api.py  # 聊天历史API测试
+│   ├── test_guest_session_api.py # 访客会话API测试
+│   ├── test_invitation_api.py    # 邀请API测试
+│   ├── test_share_session_api.py # 分享会话API测试
+│   ├── test_user_profile_api.py  # 用户Profile API测试
+│   ├── test_user_session_api.py  # 用户会话API测试
+│   └── test_voice_chat_api.py    # 语音聊天API测试
 ├── logs/                     # 日志文件
 ├── allure-results/           # Allure结果文件
 ├── allure-report/            # Allure报告文件
 ├── requirements.txt           # Python依赖
-├── pytest.ini               # pytest配置
+├── pyproject.toml            # 项目配置
 ├── conftest.py              # pytest全局配置
 ├── config.yaml              # 项目配置
+├── env.example              # 环境变量示例
 ├── Jenkinsfile              # Jenkins流水线
 ├── run_tests.py             # 测试运行脚本
+├── activate_venv.sh         # Linux/macOS虚拟环境激活脚本
+├── activate_venv.bat        # Windows虚拟环境激活脚本
 └── README.md                # 项目说明
 ```
 
@@ -103,7 +114,18 @@ export PATH=$PATH:/opt/allure/bin
 
 ## 🚀 快速开始
 
-### 1. 激活虚拟环境
+### 1. 配置环境变量
+
+```bash
+# 复制环境变量示例文件
+cp env.example .env
+
+# 编辑 .env 文件，配置认证信息
+GODGPT_USERNAME=your_username@example.com
+GODGPT_PASSWORD=your_password
+```
+
+### 2. 激活虚拟环境
 
 #### macOS/Linux
 ```bash
@@ -115,43 +137,43 @@ export PATH=$PATH:/opt/allure/bin
 activate_venv.bat
 ```
 
-### 2. 运行所有测试
+### 3. 运行所有测试
 
 ```bash
 python run_tests.py
 ```
 
-### 3. 运行冒烟测试
+### 4. 运行冒烟测试
 
 ```bash
 python run_tests.py --markers smoke
 ```
 
-### 4. 运行回归测试
+### 5. 运行回归测试
 
 ```bash
 python run_tests.py --markers regression
 ```
 
-### 5. 并行执行测试
+### 6. 并行执行测试
 
 ```bash
 python run_tests.py --parallel
 ```
 
-### 6. 指定测试环境
+### 7. 指定测试环境
 
 ```bash
 python run_tests.py --env test
 ```
 
-### 7. 生成并打开报告
+### 8. 生成并打开报告
 
 ```bash
 python run_tests.py --open-report
 ```
 
-### 8. 安装依赖并运行测试
+### 9. 安装依赖并运行测试
 
 ```bash
 python run_tests.py --install
@@ -159,14 +181,20 @@ python run_tests.py --install
 
 ## 🧪 测试用例
 
-### 认证管理测试 (`test_auth_manager.py`) # Added
+### 认证管理测试 (`test_auth_manager.py`)
 - ✅ 获取认证Token
 - ✅ Token有效性检查
 - ✅ 强制刷新Token
 - ✅ 清除Token
 - ✅ Token缓存机制
 
-### GodGPT 非登录会话API测试 (`test_guest_session_api.py`) # Updated
+### 聊天历史API测试 (`test_chat_history_api.py`)
+- ✅ 获取聊天历史记录
+- ✅ 分页查询聊天历史
+- ✅ 按时间范围查询
+- ✅ 聊天历史数据验证
+
+### 访客会话API测试 (`test_guest_session_api.py`)
 - ✅ 创建访客会话
 - ✅ 创建带引导参数的访客会话
 - ✅ 创建访客会话-空请求体
@@ -183,13 +211,39 @@ python run_tests.py --install
 - ✅ 非登录聊天-性能测试
 - ✅ 非登录聊天-并发测试
 
-### 用户Profile API测试 (`test_user_profile_api.py`) # Added
+### 邀请API测试 (`test_invitation_api.py`)
+- ✅ 创建邀请链接
+- ✅ 验证邀请码
+- ✅ 邀请用户注册
+- ✅ 邀请链接过期处理
+
+### 分享会话API测试 (`test_share_session_api.py`)
+- ✅ 创建分享会话
+- ✅ 获取分享会话信息
+- ✅ 加入分享会话
+- ✅ 分享会话权限控制
+
+### 用户Profile API测试 (`test_user_profile_api.py`)
 - ✅ 查询用户Profile信息
 - ✅ 查询用户Profile-无效Token
 - ✅ 查询用户Profile-缺少Token
 - ✅ 查询用户Profile-无效的请求方法
 - ✅ 查询用户Profile-性能测试
 - ✅ 查询用户Profile-并发测试
+
+### 用户会话API测试 (`test_user_session_api.py`)
+- ✅ 用户登录会话管理
+- ✅ 会话状态检查
+- ✅ 会话续期
+- ✅ 会话注销
+
+### 语音聊天API测试 (`test_voice_chat_api.py`)
+- ✅ 语音聊天初始化
+- ✅ 语音消息发送
+- ✅ 语音消息接收
+- ✅ 语音聊天会话管理
+- ✅ 语音质量测试
+- ✅ 语音聊天性能测试
 
 ## 📊 测试报告
 
@@ -245,36 +299,9 @@ GODGPT_PASSWORD=your_password
 - 建议使用 `.env` 文件进行本地开发
 - 生产环境使用系统环境变量
 
-4. **Jenkins 配置**:
-```groovy
-environment {
-    GODGPT_USERNAME = credentials('godgpt-username')
-    GODGPT_PASSWORD = credentials('godgpt-password')
-}
-```
 
-#### 认证配置
 
-认证凭据在 `common/auth_manager.py` 中从环境变量读取：
 
-```python
-# 自动加载 .env 文件
-self._load_env_file()
-
-# 从环境变量获取认证凭据
-self.auth_credentials = {
-    'grant_type': 'password',
-    'client_id': 'AevatarAuthServer',
-    'apple_app_id': 'com.gpt.god',
-    'scope': 'Aevatar offline_access',
-    'username': os.getenv('GODGPT_USERNAME'),
-    'password': os.getenv('GODGPT_PASSWORD')
-}
-
-# 验证认证凭据是否配置
-if not self.auth_credentials['username'] or not self.auth_credentials['password']:
-    raise ValueError("认证凭据未配置，请设置 GODGPT_USERNAME 和 GODGPT_PASSWORD 环境变量")
-```
 
 #### 使用方法
 
@@ -311,23 +338,31 @@ environments:
     timeout: 60
 ```
 
-### pytest配置 (`pytest.ini`)
+### pytest配置 (`pyproject.toml`)
 
-```ini
-[tool:pytest]
-testpaths = tests
-python_files = test_*.py
-python_classes = Test*
-python_functions = test_*
-addopts = 
-    -v
-    --tb=short
-    --alluredir=./allure-results
-    --clean-alluredir
-markers =
-    smoke: 冒烟测试
-    regression: 回归测试
-    api: API测试
+```toml
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--alluredir=./allure-results",
+    "--clean-alluredir",
+]
+markers = [
+    "smoke: 冒烟测试",
+    "regression: 回归测试", 
+    "api: API测试",
+    "slow: 慢速测试",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
 ```
 
 ## 🏭 Jenkins集成
@@ -456,6 +491,26 @@ pytest -v
 pytest --reruns 3
 ```
 
+## 📦 依赖包
+
+### 核心依赖
+
+- **pytest==7.4.3**: 测试框架
+- **requests==2.31.0**: HTTP客户端
+- **allure-pytest==2.13.2**: Allure报告集成
+- **loguru==0.7.2**: 日志管理
+- **faker==20.1.0**: 测试数据生成
+- **PyYAML==6.0.1**: YAML配置文件处理
+
+### 测试工具
+
+- **pytest-html==4.1.1**: HTML报告
+- **pytest-xdist==3.3.1**: 并行执行
+- **pytest-rerunfailures==12.0**: 失败重试
+- **pytest-timeout==2.1.0**: 超时控制
+- **jsonschema==4.20.0**: JSON模式验证
+- **python-dotenv==1.0.0**: 环境变量管理
+
 ## 🐛 常见问题
 
 ### 1. Allure命令找不到
@@ -484,6 +539,17 @@ export LC_ALL=zh_CN.UTF-8
 # 检查Allure插件安装
 # 检查报告路径配置
 # 检查权限设置
+```
+
+### 4. 认证失败
+
+```bash
+# 检查环境变量配置
+echo $GODGPT_USERNAME
+echo $GODGPT_PASSWORD
+
+# 检查.env文件
+cat .env
 ```
 
 ## 📄 许可证
