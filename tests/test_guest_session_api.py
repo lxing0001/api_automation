@@ -247,6 +247,7 @@ class TestGuestSessionAPI:
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.smoke
     @pytest.mark.api
+    @pytest.mark.guest
     def test_guest_chat_basic(self):
         """测试非登录状态下的基本聊天"""
         endpoint = "/godgptprod-client/api/godgpt/guest/chat"
