@@ -316,7 +316,7 @@ pipeline {
                                 tag: "div",
                                 text: [
                                     tag: "lark_md",
-                                    content: "**项目名称**: GodGPT API自动化巡检项目\n**构建编号**: #${currentBuild.number}\n**构建状态**: ${statusText}\n**构建时间**: ${new Date().format('yyyy-MM-dd HH:mm:ss')}\n**构建时长**: ${currentBuild.durationString}"
+                                    content: "**项目名称**: GodGPT API自动化巡检项目\n**构建编号**: #${currentBuild.number}\n**构建状态**: ${statusText}\n**构建时间**: ${new Date().format('yyyy-MM-dd HH:mm:ss', TimeZone.getTimeZone('Asia/Shanghai'))}\n**构建时长**: ${currentBuild.durationString}"
                                 ]
                             ],
                             [
